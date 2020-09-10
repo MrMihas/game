@@ -61,9 +61,7 @@ table {
 	position: relative;
 	background: transparent url('car.png') center / cover no-repeat;
 	position: absolute;
-	left: 50%;
-	transform: translateX(-50%);
-	bottom: 15px;
+
 }
 
 

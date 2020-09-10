@@ -19,8 +19,8 @@ const keys = {
 const setting = {
 	start: false,
 	score: 0,
-	speed: 5,
-	traffic:3
+	speed: 20,
+	traffic:10
 };
 
 function gerQuantituElements(heightElement){
@@ -29,6 +29,9 @@ function gerQuantituElements(heightElement){
 
 const startGame = () => {
 	start.classList.add('hide');
+	gameArea.innerHTML ="";
+	setting.score = 0;
+
 	for(let i = 0; i < gerQuantituElements(100); i++){
 		const line = document.createElement('div');
 		line.classList.add('line');
@@ -42,7 +45,7 @@ for (let i = 0; i < gerQuantituElements(100 * setting.traffic); i++) {
 	const randomEnemy = Math.floor(Math.random() * MAX_ENEMY) + 1;
 	enemy.classList.add('enemy');
 	enemy.y = -100 * setting.traffic *( i + 1);
-	enemy.style.top = Math.floor(Math.random() * gameArea.offsetHeight) + 'px';
+	enemy.style.top = Math.floor(Math.random() * (gameArea.offsetHeight - 50)) + 'px';
 	enemy.style.left =Math.floor(Math.random() * (gameArea.offsetWidth - 50)) + 'px';
 	enemy.style.background = `transparent url(cars/enemy${randomEnemy}.png) center / cover no-repeat`;
 	gameArea.appendChild(enemy);
@@ -52,6 +55,9 @@ for (let i = 0; i < gerQuantituElements(100 * setting.traffic); i++) {
 
 	setting.start = true;
 	gameArea.append(car);
+	car.style.bottom = '10px';
+	car.style.top = 'auto';
+	car.style.left = (gameArea.offsetWidth / 2) - (car.offsetWidth/2);
 	setting.x = car.offsetLeft;
 	setting.y = car.offsetTop;
 	requestAnimationFrame(playGame);
@@ -60,9 +66,10 @@ for (let i = 0; i < gerQuantituElements(100 * setting.traffic); i++) {
 const  playGame = function(){
 	
 	if (setting.start === true) {
-		
+		setting.score += setting.speed;
+		score.textContent = `Заработали ${setting.score} очков`;
 		if(keys.ArrowLeft && setting.x >0){
-			setting.x -= setting.speed;
+			setting.x -= setting.speed + setting.traffic;
 		}
 
 		if(keys.ArrowRight && setting.x < gameArea.offsetWidth){
@@ -113,8 +120,19 @@ function moveRoad(){
 }
 
 function moveEnemy(){
-	let enemys = document.querySelectorAll('.enemy');
-	enemys.forEach(item =>{
+	let enemies = document.querySelectorAll('.enemy');
+	enemies.forEach(item =>{
+		let carRect = car.getBoundingClientRect();
+		let enemyRect = item.getBoundingClientRect();
+
+		if(carRect.top <=  enemyRect.bottom &&
+			carRect.right >= enemyRect.left &&
+			carRect.left <= enemyRect.right &&
+			carRect.bottom >= enemyRect.top){
+						setting.start = false;
+						start.classList.remove('hide');
+						score.style.top = start.offsetTop;
+		}
 			item.y += setting.speed / 2;
 			item.style.top = item.y + 'px';
 			if(item.y >= document.documentElement.clientHeight){
